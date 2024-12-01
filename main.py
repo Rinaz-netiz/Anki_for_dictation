@@ -8,11 +8,9 @@ from rich.console import Console
 from typing import AnyStr, List
 import csv
 
-URL = "https://edubenchmark.com/blog/environment-ielts-vocabulary/"
 
-
-def req_to_site() -> AnyStr:
-    r = requests.get(URL)
+def req_to_site(url: str) -> AnyStr:
+    r = requests.get(url)
     if r.status_code == 200:
         return r.text
     return ""
@@ -48,14 +46,14 @@ def create_voice(data: List[list]) -> List[list]:
             tts.save(f"voices/{word[1].replace('/', ' ')}.mp3")
             res.append([f"[sound:{word[1].replace('/', ' ')}.mp3]", word[0]])
         except FileNotFoundError:
-            print(word)
+            print(f"Couldn't create  sound for: {word[0]}: {word[1]}")
 
     print("Media is ready")
     return res
 
 
-def main():
-    content = req_to_site()
+def main(url: str) -> None:
+    content = req_to_site(url)
     data = parse_words(content)
     res = create_voice(data)
     write_to_csv(res)
@@ -65,4 +63,4 @@ if __name__ == "__main__":
     console = Console()
     url = Prompt.ask("[bold green]Please enter the URL[/bold green]:", default="https://")
     console.print(f"You entered: [bold blue]{url}[/bold blue]")
-    main()
+    main(url)
